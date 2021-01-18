@@ -10,7 +10,7 @@
     "preserveConstEnums": true,
     "sourceMap": true,
     "rootDir": "src",
-    "outDir": "build",
+    "outDir": "dist",
     "allowJs": true,
     "resolveJsonModule": true,
     "target": "ES2020"

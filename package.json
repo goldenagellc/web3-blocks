@@ -1,15 +1,17 @@
 {
-  "name": "web3-blocks",
+  "name": "@goldenagellc/web3-blocks",
   "version": "0.0.1",
   "description": "Higher level building blocks to improve QoL when working with web3.js",
   "repository": "https://github.com/goldenagellc/web3-blocks",
   "author": "Hayden Shively",
   "license": "None",
-  "private": true,
-  "main": "build/index.js",
-  "module": "build/index.js",
-  "types": "build/index.d.ts",
-  "files": ["build/**/*"],
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": ["dist/**/*"],
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/"
+  },
   "dependencies": {
     "@ethereumjs/common": "^2.0.0",
     "@ethereumjs/tx": "^3.0.0",
@@ -47,6 +49,7 @@
   "scripts": {
     "build": "tsc -p .",
     "lint": "eslint 'src/**/*.{js,ts,tsx}' --fix",
-    "test": "mocha -r ts-node/register test/*.test.ts test/**/*.test.ts"
+    "test": "mocha -r ts-node/register test/*.test.ts test/**/*.test.ts",
+    "prepare": "npx tsc -p ."
   }
 }
