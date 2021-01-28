@@ -9,8 +9,8 @@ import Wallet from './Wallet';
 const winston = require('winston');
 /* eslint-enable @typescript-eslint/no-var-requires */
 
-export default class TxQueue {
-  private wallet: Wallet;
+export default class Queue {
+  public readonly wallet: Wallet;
 
   private lowestLiquidNonce: number;
 

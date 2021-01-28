@@ -19,7 +19,7 @@ interface ITxHex {
 }
 
 export default class Wallet {
-  private provider: IProviderGroup;
+  private readonly provider: IProviderGroup;
 
   private readonly envKeyAddress: string;
 
