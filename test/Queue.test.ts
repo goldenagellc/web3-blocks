@@ -55,7 +55,11 @@ describe('Queue Test', () => {
         ],
       }),
     );
-    wallet = new Wallet(ganacheProvider, 'ACCOUNT_ADDRESS_TEST', 'ACCOUNT_SECRET_TEST');
+    wallet = new Wallet(
+      ganacheProvider,
+      String(process.env.ACCOUNT_ADDRESS_TEST),
+      String(process.env.ACCOUNT_SECRET_TEST),
+    );
     queue = new TxQueue(wallet);
   });
 

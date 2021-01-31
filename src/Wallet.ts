@@ -21,9 +21,9 @@ interface ITxHex {
 export default class Wallet {
   private readonly provider: IProviderGroup;
 
-  private readonly envKeyAddress: string;
+  public readonly address: string;
 
-  private readonly envKeySecret: string;
+  private readonly privateKey: string;
 
   private opts: EthJSTxOpts | undefined;
 
@@ -33,20 +33,31 @@ export default class Wallet {
    * Constructs a new Wallet instance
    *
    * @param provider the provider(s) to use for transactions
-   * @param envKeyAddress name of env variable containing the address
-   * @param envKeySecret name of env variable containing private key
+   * @param address the address (0x prefix included)
+   * @param privateKey the private key (0x prefix removed)
    */
-  constructor(provider: IProviderGroup | Web3, envKeyAddress: string, envKeySecret: string) {
+  constructor(provider: IProviderGroup | Web3, address: string, privateKey: string) {
     this.provider = provider instanceof Web3 ? new ProviderGroup(provider) : provider;
-    this.envKeyAddress = envKeyAddress;
-    this.envKeySecret = envKeySecret;
+    this.address = address;
+    this.privateKey = privateKey;
 
     // Nothing is ever deleted from gasPrices. If this code were
     // to run forever, this would cause memory to grow forever (very slowly).
     this.gasPrices = {};
   }
 
-  async init(): Promise<void> {
+  /**
+   * Initializes wallet such that it has correct chain/hardfork parameters
+   * when sending transactions
+   *
+   * @param opts (optional) parameters copied from another wallet
+   */
+  async init(opts: EthJSTxOpts | undefined = undefined): Promise<void> {
+    if (opts !== undefined) {
+      this.opts = opts;
+      return;
+    }
+
     const chainID = await this.provider.eth.getChainId();
     switch (chainID) {
       case 1337: // ganache
@@ -63,10 +74,6 @@ export default class Wallet {
       default:
         throw new Error(`Chain ID ${chainID} unknown`);
     }
-  }
-
-  public get address(): string {
-    return String(process.env[this.envKeyAddress]);
   }
 
   public get label(): string {
@@ -161,7 +168,7 @@ export default class Wallet {
   private sign(txHex: ITxHex): string {
     // txHex.from is automatically determined from private key
     const tx = EthJSTx.fromTxData(txHex, this.opts);
-    const privateKey = Buffer.from(String(process.env[this.envKeySecret]), 'hex');
+    const privateKey = Buffer.from(this.privateKey, 'hex');
     return `0x${tx.sign(privateKey).serialize().toString('hex')}`;
   }
 
@@ -205,7 +212,39 @@ export default class Wallet {
     return this.provider.eth.getTransactionCount(this.address);
   }
 
+  /**
+   * Convenience function that calls `provider.eth.getBalance`
+   *
+   * @returns the wallet's ETH balance, with 18 balances (1ETH = 1e18)
+   */
   public getBalance(): Promise<string> {
     return this.provider.eth.getBalance(this.address);
+  }
+
+  /**
+   * @param peer the wallet with which to share parameters
+   */
+  public shareOptsWithPeer(peer: Wallet): void {
+    peer.init(this.opts);
+  }
+
+  /**
+   * Constructs a new wallet and `init()`s it using the existing
+   * instance's transaction opts. Useful for synchronously setting
+   * up a new account on the same chain/hardfork.
+   */
+  public createPeer(): { wallet: Wallet, privateKey: string } {
+    // Generate info for new wallet and LOG THE PRIVATE KEY IMMEDIATELY
+    const { address, privateKey } = this.provider.eth.accounts.create();
+    console.log(privateKey);
+
+    // Setup new wallet (including call to `init()`)
+    const peer = new Wallet(this.provider, address, privateKey.slice(2));
+    this.shareOptsWithPeer(peer);
+
+    return {
+      wallet: peer,
+      privateKey: privateKey,
+    };
   }
 }

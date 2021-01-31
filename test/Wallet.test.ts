@@ -35,7 +35,11 @@ describe('Wallet Test', () => {
         ],
       }),
     );
-    wallet = new Wallet(ganacheProvider, 'ACCOUNT_ADDRESS_TEST', 'ACCOUNT_SECRET_TEST');
+    wallet = new Wallet(
+      ganacheProvider,
+      String(process.env.ACCOUNT_ADDRESS_TEST),
+      String(process.env.ACCOUNT_SECRET_TEST),
+    );
   });
 
   after(() => {
@@ -102,5 +106,11 @@ describe('Wallet Test', () => {
 
     const gas = await wallet.estimateGas(tx, nonce);
     expect(gas).to.equal(21000);
+  }).timeout(4000);
+
+  it('should create peer', async () => {
+    const peer = wallet.createPeer().wallet;
+    const balance = await peer.getBalance();
+    expect(balance).to.equal("0");
   }).timeout(4000);
 });
