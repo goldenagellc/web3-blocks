@@ -72,15 +72,15 @@ export default class Queue {
    * If the nonce has increased, `rebase()` will remove confirmed
    * transactions from the queue
    *
-   * @returns the number of nonces confirmed since last call
+   * @returns a list of confirmed transactions
    */
-  public async rebase(): Promise<number> {
+  public async rebase(): Promise<ITx[]> {
     const diff = (await this.wallet.getLowestLiquidNonce()) - this.lowestLiquidNonce;
-    this.queue.splice(0, diff); // Could log confirmed txs via returned array slice
+    const confirmed = this.queue.splice(0, diff);
     this.lowestLiquidNonce += diff;
 
     if (diff !== 0) winston.info(`⚡️ *Rebase* jumped forward ${diff} nonce(s) on ${this.wallet.label}`);
-    return diff;
+    return confirmed;
   }
 
   /**
