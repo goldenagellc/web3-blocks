@@ -250,7 +250,7 @@ export default class Queue {
   private onTxReceipt(receipt: ITxReceipt): void {
     this.rebase();
     // Logging
-    const label = `💸 *Transaction* ${this.wallet.label}:${receipt.transactionHash.slice(0, 6)} was `;
+    const label = `💸 *Transaction* ${this.wallet.label}:${receipt.transactionHash.slice(0, 6)} `;
     const linkText = receipt.status ? 'successful!' : 'reverted';
     winston.info(`${label}was <https://etherscan.io/tx/${receipt.transactionHash}|${linkText}>`);
   }

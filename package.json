@@ -1,6 +1,6 @@
 {
   "name": "@goldenagellc/web3-blocks",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "Higher level building blocks to improve QoL when working with web3.js",
   "author": "Hayden Shively",
   "license": "None",
