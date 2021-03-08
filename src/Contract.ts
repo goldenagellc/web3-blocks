@@ -24,7 +24,7 @@ export type AsyncCaller<T> = (provider: Web3, block?: BlockNumber) => Promise<T>
  * to events and/or retrieving past events because the API is clear and will notify
  * listeners if an on-chain event was rolled back by a chain fork.
  */
-export default abstract class Contract {
+export default class Contract {
   public readonly address: string;
 
   protected readonly abi: Web3Utils.AbiItem[];
