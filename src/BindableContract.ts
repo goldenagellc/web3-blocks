@@ -4,7 +4,7 @@ import { Contract as IWeb3Contract } from 'web3-eth-contract';
 import Web3Utils from 'web3-utils';
 import Web3 from 'web3';
 
-import { Contract } from '.';
+import Contract from './Contract';
 
 type StandardEnum = { [id: string]: string };
 
@@ -16,7 +16,7 @@ interface IBindedContract<EventEnum extends StandardEnum> {
   subscribeTo: AvailableEmitters<EventEnum>;
 }
 
-export default abstract class BindableContract<EventEnum extends StandardEnum> extends Contract {
+export default class BindableContract<EventEnum extends StandardEnum> extends Contract {
   protected readonly creationBlock: number;
 
   protected readonly events: AvailableEmitters<EventEnum>;
