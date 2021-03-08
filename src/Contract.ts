@@ -12,7 +12,7 @@ const Web3Contract = require('web3-eth-contract');
 /* eslint-enable @typescript-eslint/no-var-requires */
 
 type IWeb3Response = { [key: string]: any };
-type AsyncCaller<T> = (provider: Web3, block?: BlockNumber) => Promise<T>;
+export type AsyncCaller<T> = (provider: Web3, block?: BlockNumber) => Promise<T>;
 
 /**
  * The ordinary `web3.eth.Contract(...)` implementation uses `web3.currentProvider`
