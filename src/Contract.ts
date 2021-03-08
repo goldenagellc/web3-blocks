@@ -1,3 +1,4 @@
+import { BlockNumber } from 'web3-core';
 import { Contract as IWeb3Contract, ContractSendMethod as Web3Method } from 'web3-eth-contract';
 import Web3Utils from 'web3-utils';
 import Web3 from 'web3';
@@ -11,6 +12,7 @@ const Web3Contract = require('web3-eth-contract');
 /* eslint-enable @typescript-eslint/no-var-requires */
 
 type IWeb3Response = { [key: string]: any };
+type AsyncCaller<T> = (provider: Web3, block?: BlockNumber) => Promise<T>;
 
 /**
  * The ordinary `web3.eth.Contract(...)` implementation uses `web3.currentProvider`
@@ -46,10 +48,9 @@ export default abstract class Contract {
    * whose return type is uint256
    *
    * @param method the Solidity method to call (with input params)
-   * @param modifier function that applies post-processing after fetching
    */
-  protected callerForUint256(method: Web3Method, modifier = (x: Big): any => x) {
-    return this.callerFor(method, ['uint256'], (x) => modifier(Big(x['0'])));
+  protected callerForUint256(method: Web3Method): AsyncCaller<Big> {
+    return this.callerFor<Big>(method, ['uint256'], (x) => Big(x['0']));
   }
 
   /**
@@ -59,8 +60,8 @@ export default abstract class Contract {
    * @param outputTypes array of Solidity return types, e.g. 'uint256'
    * @param modifier function that applies post-processing after fetching
    */
-  protected callerFor(method: Web3Method, outputTypes: string[], modifier = (x: IWeb3Response): any => x) {
-    return async (provider: Web3, block = 'latest') => {
+  protected callerFor<T>(method: Web3Method, outputTypes: string[], modifier: (x: IWeb3Response) => T): AsyncCaller<T> {
+    return async (provider: Web3, block: BlockNumber = 'latest') => {
       const x = await provider.eth.call(
         {
           to: this.address,
@@ -88,7 +89,7 @@ export default abstract class Contract {
     };
   }
 
-  protected storageAt(slot: string, modifier = (x: string): any => x) {
+  protected storageAt<T>(slot: string, modifier: (x: string) => T): AsyncCaller<T> {
     return async (provider: Web3, block = 'latest') => {
       const x = await provider.eth.getStorageAt(this.address, slot, block);
       return modifier(x);

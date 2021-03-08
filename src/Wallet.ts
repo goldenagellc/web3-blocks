@@ -233,7 +233,7 @@ export default class Wallet {
    * instance's transaction opts. Useful for synchronously setting
    * up a new account on the same chain/hardfork.
    */
-  public createPeer(): { wallet: Wallet, privateKey: string } {
+  public createPeer(): { wallet: Wallet; privateKey: string } {
     // Generate info for new wallet and LOG THE PRIVATE KEY IMMEDIATELY
     const { address, privateKey } = this.provider.eth.accounts.create();
     console.log(privateKey);
@@ -244,7 +244,7 @@ export default class Wallet {
 
     return {
       wallet: peer,
-      privateKey: privateKey,
+      privateKey,
     };
   }
 }
