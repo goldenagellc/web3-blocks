@@ -259,8 +259,8 @@ export default class Queue {
     const responses: any = {
       'nonce too low': 'rebase',
       'not mined within': 'ignore',
+      'already known': 'ignore',
       // 'replacement transaction underpriced': 'ignore',
-      // 'already known': 'ignore',
     };
 
     for (const text in responses) {
