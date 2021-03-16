@@ -260,7 +260,7 @@ export default class Queue {
       'nonce too low': 'rebase',
       'not mined within': 'ignore',
       'already known': 'ignore',
-      // 'replacement transaction underpriced': 'ignore',
+      'replacement transaction underpriced': 'ignore',
     };
 
     for (const text in responses) {
