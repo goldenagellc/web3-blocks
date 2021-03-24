@@ -164,15 +164,12 @@ export default class Queue {
       case 'as_is':
         break;
       case 'clip':
-        if (maxGasPrice !== null && tx.gasPrice.gt(maxGasPrice)) {
-          tx.gasPrice = maxGasPrice;
-          break;
-        }
         const minGasPrice = this.wallet.minGasPriceFor(this.nonce(idx));
-        if (tx.gasPrice.gt(minGasPrice)) break;
+        if (tx.gasPrice.lt(minGasPrice)) tx.gasPrice = minGasPrice;
+        if (maxGasPrice !== null && tx.gasPrice.gt(maxGasPrice)) tx.gasPrice = maxGasPrice;
+        break;
       case 'min':
-        // @ts-ignore: Intentional fallthrough
-        tx.gasPrice = minGasPrice;
+        tx.gasPrice = this.wallet.minGasPriceFor(this.nonce(idx));
         break;
       default:
         throw new Error(`Gas price mode ${gasPriceMode} isn't defined`);
