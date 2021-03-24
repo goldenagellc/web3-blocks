@@ -197,7 +197,9 @@ export default class Queue {
     callback: (receipt: ITxReceipt | null) => void = () => {},
     mainConnectionIdx = 0,
     useAllConnections = true,
-  ): PromiEvent<ITxReceipt> {
+  ): PromiEvent<ITxReceipt> | null {
+    if (this.queue[idx].gasLimit.eq('21000') && this.queue[idx].to === this.wallet.address) return null;
+
     this.queue[idx] = this.wallet.emptyTx;
     this.queue[idx].gasPrice = this.wallet.minGasPriceFor(this.nonce(idx));
     return this.broadcast(idx, callback, mainConnectionIdx, useAllConnections);

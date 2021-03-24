@@ -1,8 +1,8 @@
 {
   "name": "@goldenagellc/web3-blocks",
-  "version": "0.0.9",
+  "version": "0.1.0",
   "description": "Higher level building blocks to improve QoL when working with web3.js",
-  "author": "Hayden Shively",
+  "author": "Golden Age Technologies LLC",
   "license": "None",
   "main": "dist/index.js",
   "module": "dist/index.js",
