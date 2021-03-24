@@ -39,10 +39,7 @@ export default class ProviderGroupEth implements IProviderGroupEth {
   closeConnections(): void {
     this.providers.forEach((p) => {
       if (p.currentProvider === null) return;
-      if (
-        p.currentProvider.constructor.name === 'WebsocketProvider' ||
-        p.currentProvider.constructor.name === 'IpcProvider'
-      )
+      if (p.currentProvider.constructor.name === 'IpcProvider')
         try {
           // @ts-expect-error: We already checked that type is valid
           p.currentProvider.connection.close();
@@ -50,6 +47,12 @@ export default class ProviderGroupEth implements IProviderGroupEth {
           // @ts-expect-error: We already checked that type is valid
           p.currentProvider.connection.destroy();
         }
+      else if (p.currentProvider.constructor.name === 'WebsocketProvider') {
+        // @ts-expect-error
+        p.currentProvider.reconnectOptions.auto = false; // @ts-expect-error
+        p.currentProvider.reset(); // @ts-expect-error
+        p.currentProvider.disconnect();
+      }
     });
   }
 }
