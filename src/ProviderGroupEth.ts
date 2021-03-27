@@ -36,6 +36,17 @@ export default class ProviderGroupEth implements IProviderGroupEth {
     return this.providers[mainConnectionIdx].eth.sendSignedTransaction(signedTx);
   }
 
+  public dispatchSignedMEVBundle(
+    params: any[],
+    flashbotsConnectionIdx: number,
+    signer: (request: string) => string,
+  ): PromiEvent<any> {
+    // @ts-ignore
+    this.providers[flashbotsConnectionIdx]._provider._signer = signer;
+    // @ts-expect-error: Custom Web3 extension
+    return this.providers[flashbotsConnectionIdx].sendRawBundle(params[0], params[1], params[2], params[3]);
+  }
+
   closeConnections(): void {
     this.providers.forEach((p) => {
       if (p.currentProvider === null) return;

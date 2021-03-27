@@ -111,6 +111,23 @@ describe('Wallet Test', () => {
   it('should create peer', async () => {
     const peer = wallet.createPeer().wallet;
     const balance = await peer.getBalance();
-    expect(balance).to.equal("0");
+    expect(balance).to.equal('0');
+  }).timeout(4000);
+
+  it('should send MEV bundle', async () => {
+    const flashbotsProvider = providerFor('mainnet', { type: 'Flashbots' });
+    const flashbotsWallet = new Wallet(
+      flashbotsProvider,
+      process.env.ACCOUNT_ADDRESS_TEST!,
+      process.env.ACCOUNT_SECRET_TEST!,
+    );
+    
+    const block = await mainnetProvider.eth.getBlockNumber();
+    const nonce = await wallet.getLowestLiquidNonce();
+    const tx = wallet.emptyTx;
+    tx.gasLimit = tx.gasLimit.mul('5');
+
+    const res = await flashbotsWallet.signAndSendMEVBundle([tx], [nonce], 0, block);
+    expect(res).to.be.null;
   }).timeout(4000);
 });

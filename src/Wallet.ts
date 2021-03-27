@@ -1,3 +1,5 @@
+import EthCrypto from 'eth-crypto';
+import { hashMessage, id as hashId } from '@ethersproject/hash';
 import Common from '@ethereumjs/common';
 import { Transaction as EthJSTx, TxOptions as EthJSTxOpts } from '@ethereumjs/tx';
 import { PromiEvent, TransactionReceipt as ITxReceipt } from 'web3-core';
@@ -183,6 +185,25 @@ export default class Wallet {
    */
   private send(signedTx: string, mainConnectionIdx = 0, useAllConnections = true): PromiEvent<ITxReceipt> {
     return this.provider.eth.dispatchSignedTransaction(signedTx, mainConnectionIdx, useAllConnections);
+  }
+
+  public signAndSendMEVBundle(
+    txs: ITx[],
+    nonces: number[],
+    connectionIdx: number,
+    targetBlock: number,
+  ): PromiEvent<any> {
+    const signedTxs = txs.map((tx, i) => this.sign(Wallet.parse(tx, nonces[i])));
+    return this.sendMEVBundle(signedTxs, connectionIdx, targetBlock);
+  }
+
+  private sendMEVBundle(signedTxs: string[], connectionIdx: number, targetBlock: number): PromiEvent<any> {
+    const params = [signedTxs, `0x${targetBlock.toString(16)}`, 0, 0];
+    const signer = (request: string): string => {
+      const message = hashMessage(hashId(request));
+      return `${this.address}:${EthCrypto.sign(this.privateKey, message)}`;
+    };
+    return this.provider.eth.dispatchSignedMEVBundle(params, connectionIdx, signer);
   }
 
   /**

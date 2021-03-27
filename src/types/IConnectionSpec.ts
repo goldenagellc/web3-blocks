@@ -1,5 +1,5 @@
 export default interface IConnectionSpec {
-  type: string;
+  type: 'IPC' | 'WS_Infura' | 'WS_Alchemy' | 'HTTP_Infura' | 'HTTP_Alchemy' | 'Flashbots';
   envKeyPath?: string;
   envKeyID?: string;
   envKeyKey?: string;
