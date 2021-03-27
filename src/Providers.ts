@@ -3,6 +3,7 @@ import { chain as Chain } from 'web3-core';
 import Web3 from 'web3';
 
 import IConnectionSpec from './types/IConnectionSpec';
+import Web3FlashbotsProvider from './_Web3FlashbotsProvider';
 
 const IPCProvider = (path: string): Web3 => {
   return new Web3(new Web3.providers.IpcProvider(path, net));
@@ -25,6 +26,26 @@ const WSProvider = (path: string): Web3 => {
 };
 const HTTPProvider = (path: string): Web3 => {
   return new Web3(new Web3.providers.HttpProvider(path));
+};
+const FlashbotsProvider = (path: string): Web3 => {
+  const p = new Web3(new Web3FlashbotsProvider(path));
+
+  p.extend({
+    methods: [
+      {
+        name: 'sendRawBundle',
+        call: 'eth_sendBundle',
+        params: 4,
+      },
+      {
+        name: 'simulateBundle',
+        call: 'eth_callBundle',
+        params: 1,
+      },
+    ],
+  });
+
+  return p;
 };
 
 /**
@@ -51,6 +72,8 @@ export const providerFor = (chain: Chain, spec: IConnectionSpec): Web3 => {
       return HTTPProvider(`https://${chain}.infura.io/v3/${process.env[String(spec.envKeyID)]}`);
     case 'HTTP_Alchemy':
       return HTTPProvider(`https://eth-${chain}.alchemyapi.io/v2/${process.env[String(spec.envKeyKey)]}`);
+    case 'Flashbots':
+      return FlashbotsProvider('https://relay.flashbots.net');
     default:
       throw new Error(`Provider spec type ${spec.type} unknown`);
   }

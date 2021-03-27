@@ -40,4 +40,10 @@ export default interface IProviderGroupEth extends IEthPartial {
     mainConnectionIdx?: number,
     useAllConnections?: boolean,
   ): PromiEvent<ITxReceipt>;
+
+  dispatchSignedMEVBundle(
+    params: any[],
+    flashbotsConnectionIdx: number,
+    signer: (request: string) => string,
+  ): PromiEvent<any>;
 }
