@@ -41,10 +41,14 @@ export default class ProviderGroupEth implements IProviderGroupEth {
     flashbotsConnectionIdx: number,
     signer: (request: string) => string,
   ): PromiEvent<any> {
-    // @ts-ignore
+    
+    if (!('sendRawBundle' in this.providers[flashbotsConnectionIdx].eth))
+      throw new Error(`Connection index ${flashbotsConnectionIdx} doesn't point to an MEV/Flashbots provider`);
+
+    // @ts-expect-error: Custom Web3 provider
     this.providers[flashbotsConnectionIdx]._provider._signer = signer;
     // @ts-expect-error: Custom Web3 extension
-    return this.providers[flashbotsConnectionIdx].sendRawBundle(params[0], params[1], params[2], params[3]);
+    return this.providers[flashbotsConnectionIdx].eth.sendRawBundle(params[0], params[1], params[2], params[3]);
   }
 
   closeConnections(): void {
