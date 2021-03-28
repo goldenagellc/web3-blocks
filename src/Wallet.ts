@@ -117,7 +117,6 @@ export default class Wallet {
       from: this.address,
       to: tx.to,
       value: tx.value,
-      gas: Web3Utils.toHex(tx.gasLimit.toFixed(0)),
       gasPrice: Web3Utils.toHex(tx.gasPrice.toFixed(0)),
       data: tx.data,
       nonce,
@@ -185,6 +184,31 @@ export default class Wallet {
    */
   private send(signedTx: string, mainConnectionIdx = 0, useAllConnections = true): PromiEvent<ITxReceipt> {
     return this.provider.eth.dispatchSignedTransaction(signedTx, mainConnectionIdx, useAllConnections);
+  }
+
+  public simulateMEVBundle(
+    txs: ITx[],
+    nonces: number[],
+    connectionIdx: number,
+    blockNumber: number,
+    blockTimestamp: number,
+  ): Promise<any> {
+    const signedTxs = txs.map((tx, i) => this.sign(Wallet.parse(tx, nonces[i])));
+
+    const signer = (request: string): string => {
+      const message = hashMessage(hashId(request));
+      return `${this.address}:${EthCrypto.sign(this.privateKey, message)}`;
+    };
+
+    // @ts-expect-error: Custom Web3 provider
+    this.provider.eth.providers[connectionIdx]._provider._signer = signer;
+    // @ts-expect-error: Custom Web3 extension
+    return this.provider.eth.providers[connectionIdx].eth.simulateBundle(
+      signedTxs,
+      `0x${blockNumber.toString(16)}`,
+      `0x${(blockNumber - 1).toString(16)}`,
+      blockTimestamp,
+    );
   }
 
   public signAndSendMEVBundle(

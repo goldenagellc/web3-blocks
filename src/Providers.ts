@@ -30,7 +30,7 @@ const HTTPProvider = (path: string): Web3 => {
 const FlashbotsProvider = (path: string): Web3 => {
   const p = new Web3(new Web3FlashbotsProvider(path));
 
-  p.extend({
+  p.eth.extend({
     methods: [
       {
         name: 'sendRawBundle',
@@ -40,7 +40,7 @@ const FlashbotsProvider = (path: string): Web3 => {
       {
         name: 'simulateBundle',
         call: 'eth_callBundle',
-        params: 1,
+        params: 4,
       },
     ],
   });
