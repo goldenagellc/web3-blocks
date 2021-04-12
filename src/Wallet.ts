@@ -207,7 +207,7 @@ export default class Wallet {
       signedTxs,
       `0x${blockNumber.toString(16)}`,
       `0x${(blockNumber - 1).toString(16)}`,
-      blockTimestamp,
+      blockTimestamp.toFixed(0),
     );
   }
 

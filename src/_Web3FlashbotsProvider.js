@@ -89,6 +89,15 @@ class FlashbotsProvider {
    */
   send(payload, callback) {
     var _this = this;
+
+    const payloadStr = JSON.stringify(payload);
+    this.headers = [
+      {
+        name: 'X-Flashbots-Signature',
+        value: this._signer(payloadStr),
+      },
+    ];
+
     var request = this._prepareRequest();
 
     request.onreadystatechange = function () {
@@ -114,8 +123,6 @@ class FlashbotsProvider {
     };
 
     try {
-      const payloadStr = JSON.stringify(payload);
-      request.setRequestHeader('X-Flashbots-Signature', this._signer(payloadStr));
       request.send(payloadStr);
     } catch (error) {
       this.connected = false;

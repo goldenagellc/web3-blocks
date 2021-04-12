@@ -127,7 +127,10 @@ describe('Wallet Test', () => {
     const tx = wallet.emptyTx;
     tx.gasLimit = tx.gasLimit.mul('5');
 
-    const res = await flashbotsWallet.signAndSendMEVBundle([tx], [nonce], 0, block);
+    let res = await flashbotsWallet.signAndSendMEVBundle([tx], [nonce], 0, block);
     expect(res).to.be.null;
+
+    res = await flashbotsWallet.simulateMEVBundle([tx], [nonce - 1], 0, block, Date.now() / 1000);
+    expect(res.totalGasUsed).to.equal(21000);
   }).timeout(4000);
 });

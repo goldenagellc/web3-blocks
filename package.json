@@ -1,6 +1,6 @@
 {
   "name": "@goldenagellc/web3-blocks",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "Higher level building blocks to improve QoL when working with web3.js",
   "author": "Golden Age Technologies LLC",
   "license": "None",
