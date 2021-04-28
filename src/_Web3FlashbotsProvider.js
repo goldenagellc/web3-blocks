@@ -107,7 +107,7 @@ class FlashbotsProvider {
 
         try {
           result = JSON.parse(result);
-          if (result.error && result.error.code === -32000) error = errors.InvalidResponse('header not found');
+          if (result.error && result.error.code === -32000) error = errors.InvalidResponse(result.error.message);
         } catch (e) {
           error = errors.InvalidResponse(request.responseText);
         }
