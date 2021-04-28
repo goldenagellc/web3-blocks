@@ -187,13 +187,16 @@ export default class Wallet {
   }
 
   public simulateMEVBundle(
-    txs: ITx[],
+    txs: (string | ITx)[],
     nonces: number[],
     connectionIdx: number,
     blockNumber: number,
     blockTimestamp: number,
   ): Promise<any> {
-    const signedTxs = txs.map((tx, i) => this.sign(Wallet.parse(tx, nonces[i])));
+    const signedTxs = txs.map((tx, i) => {
+      if (typeof tx === 'string') return tx;
+      return this.sign(Wallet.parse(tx, nonces[i]));
+    });
 
     const signer = (request: string): string => {
       const message = hashMessage(hashId(request));
@@ -212,12 +215,15 @@ export default class Wallet {
   }
 
   public signAndSendMEVBundle(
-    txs: ITx[],
+    txs: (string | ITx)[],
     nonces: number[],
     connectionIdx: number,
     targetBlock: number,
   ): PromiEvent<any> {
-    const signedTxs = txs.map((tx, i) => this.sign(Wallet.parse(tx, nonces[i])));
+    const signedTxs = txs.map((tx, i) => {
+      if (typeof tx === 'string') return tx;
+      return this.sign(Wallet.parse(tx, nonces[i]));
+    });
     return this.sendMEVBundle(signedTxs, connectionIdx, targetBlock);
   }
 
