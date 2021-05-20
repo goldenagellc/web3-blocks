@@ -219,16 +219,17 @@ export default class Wallet {
     nonces: number[],
     connectionIdx: number,
     targetBlock: number,
+    revertingTxs: string[] = []
   ): PromiEvent<any> {
     const signedTxs = txs.map((tx, i) => {
       if (typeof tx === 'string') return tx;
       return this.sign(Wallet.parse(tx, nonces[i]));
     });
-    return this.sendMEVBundle(signedTxs, connectionIdx, targetBlock);
+    return this.sendMEVBundle(signedTxs, revertingTxs, connectionIdx, targetBlock);
   }
 
-  private sendMEVBundle(signedTxs: string[], connectionIdx: number, targetBlock: number): PromiEvent<any> {
-    const params = [signedTxs, `0x${targetBlock.toString(16)}`, 0, 0];
+  private sendMEVBundle(signedTxs: string[], revertingTxs: string[], connectionIdx: number, targetBlock: number): PromiEvent<any> {
+    const params = [signedTxs, `0x${targetBlock.toString(16)}`, undefined, undefined, undefined];
     const signer = (request: string): string => {
       const message = hashMessage(hashId(request));
       return `${this.address}:${EthCrypto.sign(this.privateKey, message)}`;

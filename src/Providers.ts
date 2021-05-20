@@ -35,7 +35,7 @@ const FlashbotsProvider = (path: string): Web3 => {
       {
         name: 'sendRawBundle',
         call: 'eth_sendBundle',
-        params: 4,
+        params: 1,
       },
       {
         name: 'simulateBundle',
