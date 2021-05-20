@@ -127,10 +127,27 @@ describe('Wallet Test', () => {
     const tx = wallet.emptyTx;
     tx.gasLimit = tx.gasLimit.mul('5');
 
-    let res = await flashbotsWallet.signAndSendMEVBundle([tx], [nonce], 0, block);
-    expect(res).to.be.null;
+    // let res = await flashbotsWallet.simulateMEVBundle(
+    //   [
+    //     '0xf86b018506fc23ac0082520894d80dde7ed103a4b52a42656f8a335a628fac1b8f870d38cfd62e9000801ca04a2edeb8046a9c34ece9dae8c841930d62e0b311b9130cb9439cd9cbeec950bca04fd7ee4e389b01b53e8f29dd646e453089ecaaadd4101622f580bad9493d84e5',
+    //     tx,
+    //   ],
+    //   [0, nonce - 1],
+    //   0,
+    //   'pending',
+    // );
+    // expect(res.results[1].gasUsed).to.equal(21000);
 
-    res = await flashbotsWallet.simulateMEVBundle([tx], [nonce - 1], 0, block, Date.now() / 1000);
-    expect(res.totalGasUsed).to.equal(21000);
+    let res = await flashbotsWallet.signAndSendMEVBundle(
+      [
+        '0xf86b018506fc23ac0082520894d80dde7ed103a4b52a42656f8a335a628fac1b8f870d38cfd62e9000801ca04a2edeb8046a9c34ece9dae8c841930d62e0b311b9130cb9439cd9cbeec950bca04fd7ee4e389b01b53e8f29dd646e453089ecaaadd4101622f580bad9493d84e5',
+        tx,
+      ],
+      [0, nonce],
+      0,
+      block,
+    );
+    console.log(res);
+    expect(res).to.be.null;
   }).timeout(4000);
 });

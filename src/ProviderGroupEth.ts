@@ -48,7 +48,13 @@ export default class ProviderGroupEth implements IProviderGroupEth {
     // @ts-expect-error: Custom Web3 provider
     this.providers[flashbotsConnectionIdx]._provider._signer = signer;
     // @ts-expect-error: Custom Web3 extension
-    return this.providers[flashbotsConnectionIdx].eth.sendRawBundle(params[0], params[1], params[2], params[3]);
+    return this.providers[flashbotsConnectionIdx].eth.sendRawBundle({
+      txs: params[0],
+      blockNumber: params[1],
+      minTimestamp: params[2],
+      maxTimestamp: params[3],
+      revertingTxHashes: params[4]
+    });
   }
 
   closeConnections(): void {
