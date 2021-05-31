@@ -1,5 +1,3 @@
-import EthCrypto from 'eth-crypto';
-import { hashMessage, id as hashId } from '@ethersproject/hash';
 import Common from '@ethereumjs/common';
 import { Transaction as EthJSTx, TxOptions as EthJSTxOpts } from '@ethereumjs/tx';
 import { PromiEvent, TransactionReceipt as ITxReceipt } from 'web3-core';
@@ -21,13 +19,13 @@ interface ITxHex {
 }
 
 export default class Wallet {
-  private readonly provider: IProviderGroup;
+  protected readonly provider: IProviderGroup;
 
   public readonly address: string;
 
-  private readonly privateKey: string;
+  protected readonly privateKey: string;
 
-  private opts: EthJSTxOpts | undefined;
+  protected opts: EthJSTxOpts | undefined;
 
   protected gasPrices: { [key: number]: Big };
 
@@ -166,7 +164,7 @@ export default class Wallet {
    * };
    * const signedTx = wallet._sign(tx);
    */
-  private sign(txHex: ITxHex): string {
+  protected sign(txHex: ITxHex): string {
     // txHex.from is automatically determined from private key
     const tx = EthJSTx.fromTxData(txHex, this.opts);
     const privateKey = Buffer.from(this.privateKey, 'hex');
@@ -182,59 +180,8 @@ export default class Wallet {
    * @param useAllConnections whether to send via all connections, or just the main one
    * @returns See [here](https://web3js.readthedocs.io/en/v1.2.0/callbacks-promises-events.html#promievent)
    */
-  private send(signedTx: string, mainConnectionIdx = 0, useAllConnections = true): PromiEvent<ITxReceipt> {
+  protected send(signedTx: string, mainConnectionIdx = 0, useAllConnections = true): PromiEvent<ITxReceipt> {
     return this.provider.eth.dispatchSignedTransaction(signedTx, mainConnectionIdx, useAllConnections);
-  }
-
-  public simulateMEVBundle(
-    txs: (string | ITx)[],
-    nonces: number[],
-    connectionIdx: number,
-    blockNumber: number,
-    blockTimestamp: number,
-  ): Promise<any> {
-    const signedTxs = txs.map((tx, i) => {
-      if (typeof tx === 'string') return tx;
-      return this.sign(Wallet.parse(tx, nonces[i]));
-    });
-
-    const signer = (request: string): string => {
-      const message = hashMessage(hashId(request));
-      return `${this.address}:${EthCrypto.sign(this.privateKey, message)}`;
-    };
-
-    // @ts-expect-error: Custom Web3 provider
-    this.provider.eth.providers[connectionIdx]._provider._signer = signer;
-    // @ts-expect-error: Custom Web3 extension
-    return this.provider.eth.providers[connectionIdx].eth.simulateBundle(
-      signedTxs,
-      `0x${blockNumber.toString(16)}`,
-      `0x${(blockNumber - 1).toString(16)}`,
-      Math.floor(blockTimestamp),
-    );
-  }
-
-  public signAndSendMEVBundle(
-    txs: (string | ITx)[],
-    nonces: number[],
-    connectionIdx: number,
-    targetBlock: number,
-    revertingTxs: string[] = []
-  ): PromiEvent<any> {
-    const signedTxs = txs.map((tx, i) => {
-      if (typeof tx === 'string') return tx;
-      return this.sign(Wallet.parse(tx, nonces[i]));
-    });
-    return this.sendMEVBundle(signedTxs, revertingTxs, connectionIdx, targetBlock);
-  }
-
-  private sendMEVBundle(signedTxs: string[], revertingTxs: string[], connectionIdx: number, targetBlock: number): PromiEvent<any> {
-    const params = [signedTxs, `0x${targetBlock.toString(16)}`, undefined, undefined, undefined];
-    const signer = (request: string): string => {
-      const message = hashMessage(hashId(request));
-      return `${this.address}:${EthCrypto.sign(this.privateKey, message)}`;
-    };
-    return this.provider.eth.dispatchSignedMEVBundle(params, connectionIdx, signer);
   }
 
   /**
@@ -244,7 +191,7 @@ export default class Wallet {
    * @param nonce the transaction's nonce, as an integer (base 10)
    * @returns the transaction with all fields converted to hex
    */
-  private static parse(tx: ITx, nonce: number): ITxHex {
+  protected static parse(tx: ITx, nonce: number): ITxHex {
     return {
       nonce: Web3Utils.toHex(nonce),
       gasPrice: Web3Utils.toHex(tx.gasPrice.toFixed(0)),

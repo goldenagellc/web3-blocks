@@ -1,6 +1,8 @@
 import { PromiEvent, TransactionReceipt as ITxReceipt } from 'web3-core';
 import { Eth } from 'web3-eth';
 
+import { IFlashbotsBundleParams, IFlashbotsSimulationParams } from './Flashbots';
+
 type Partial<T> = {
   [P in keyof T]?: T[P];
 };
@@ -42,7 +44,13 @@ export default interface IProviderGroupEth extends IEthPartial {
   ): PromiEvent<ITxReceipt>;
 
   dispatchSignedMEVBundle(
-    params: any[],
+    params: IFlashbotsBundleParams,
+    flashbotsConnectionIdx: number,
+    signer: (request: string) => string,
+  ): PromiEvent<any>;
+
+  simulateSignedMEVBundle(
+    params: IFlashbotsSimulationParams,
     flashbotsConnectionIdx: number,
     signer: (request: string) => string,
   ): PromiEvent<any>;

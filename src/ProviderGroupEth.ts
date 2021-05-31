@@ -3,6 +3,7 @@ import { TransactionReceipt as ITxReceipt } from 'web3-eth';
 import Web3 from 'web3';
 
 import IProviderGroupEth from './types/IProviderGroupEth';
+import { IFlashbotsBundleParams, IFlashbotsSimulationParams } from './types/Flashbots';
 
 export default class ProviderGroupEth implements IProviderGroupEth {
   private readonly providers: Web3[];
@@ -37,24 +38,31 @@ export default class ProviderGroupEth implements IProviderGroupEth {
   }
 
   public dispatchSignedMEVBundle(
-    params: any[],
+    params: IFlashbotsBundleParams,
     flashbotsConnectionIdx: number,
     signer: (request: string) => string,
   ): PromiEvent<any> {
-    
     if (!('sendRawBundle' in this.providers[flashbotsConnectionIdx].eth))
-      throw new Error(`Connection index ${flashbotsConnectionIdx} doesn't point to an MEV/Flashbots provider`);
+      throw new Error(`Connection index ${flashbotsConnectionIdx} doesn't point to a Flashbots provider`);
 
     // @ts-expect-error: Custom Web3 provider
     this.providers[flashbotsConnectionIdx]._provider._signer = signer;
     // @ts-expect-error: Custom Web3 extension
-    return this.providers[flashbotsConnectionIdx].eth.sendRawBundle({
-      txs: params[0],
-      blockNumber: params[1],
-      minTimestamp: params[2],
-      maxTimestamp: params[3],
-      revertingTxHashes: params[4]
-    });
+    return this.providers[flashbotsConnectionIdx].eth.sendRawBundle(params);
+  }
+
+  simulateSignedMEVBundle(
+    params: IFlashbotsSimulationParams,
+    flashbotsConnectionIdx: number,
+    signer: (request: string) => string,
+  ): PromiEvent<any> {
+    if (!('simulateBundle' in this.providers[flashbotsConnectionIdx].eth))
+      throw new Error(`Connection index ${flashbotsConnectionIdx} doesn't point to a Flashbots provider`);
+
+    // @ts-expect-error: Custom Web3 provider
+    this.providers[flashbotsConnectionIdx]._provider._signer = signer;
+    // @ts-expect-error: Custom Web3 extension
+    return this.providers[flashbotsConnectionIdx].eth.simulateBundle(params);
   }
 
   closeConnections(): void {

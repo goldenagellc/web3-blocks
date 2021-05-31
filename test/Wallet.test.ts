@@ -65,7 +65,7 @@ describe('Wallet Test', () => {
     const nonce = await wallet.getLowestLiquidNonce();
     expect(typeof nonce).to.equal('number');
     expect(Number.isInteger(nonce)).to.be.true;
-  }).timeout(4000);
+  }).timeout(10000);
 
   it('should sign transactions', () => {
     const tx = {
@@ -97,7 +97,7 @@ describe('Wallet Test', () => {
     expect(receipt.to).to.equal(wallet.address.toLowerCase());
     expect(receipt.to).to.equal(receipt.from);
     expect(receipt.gasUsed).to.equal(21000);
-  }).timeout(4000);
+  }).timeout(10000);
 
   it('should estimate gas', async () => {
     const nonce = await wallet.getLowestLiquidNonce();
@@ -106,48 +106,11 @@ describe('Wallet Test', () => {
 
     const gas = await wallet.estimateGas(tx, nonce);
     expect(gas).to.equal(21000);
-  }).timeout(4000);
+  }).timeout(10000);
 
   it('should create peer', async () => {
     const peer = wallet.createPeer().wallet;
     const balance = await peer.getBalance();
     expect(balance).to.equal('0');
-  }).timeout(4000);
-
-  it('should send MEV bundle', async () => {
-    const flashbotsProvider = providerFor('mainnet', { type: 'Flashbots' });
-    const flashbotsWallet = new Wallet(
-      flashbotsProvider,
-      process.env.ACCOUNT_ADDRESS_TEST!,
-      process.env.ACCOUNT_SECRET_TEST!,
-    );
-    
-    const block = await mainnetProvider.eth.getBlockNumber();
-    const nonce = await wallet.getLowestLiquidNonce();
-    const tx = wallet.emptyTx;
-    tx.gasLimit = tx.gasLimit.mul('5');
-
-    // let res = await flashbotsWallet.simulateMEVBundle(
-    //   [
-    //     '0xf86b018506fc23ac0082520894d80dde7ed103a4b52a42656f8a335a628fac1b8f870d38cfd62e9000801ca04a2edeb8046a9c34ece9dae8c841930d62e0b311b9130cb9439cd9cbeec950bca04fd7ee4e389b01b53e8f29dd646e453089ecaaadd4101622f580bad9493d84e5',
-    //     tx,
-    //   ],
-    //   [0, nonce - 1],
-    //   0,
-    //   'pending',
-    // );
-    // expect(res.results[1].gasUsed).to.equal(21000);
-
-    let res = await flashbotsWallet.signAndSendMEVBundle(
-      [
-        '0xf86b018506fc23ac0082520894d80dde7ed103a4b52a42656f8a335a628fac1b8f870d38cfd62e9000801ca04a2edeb8046a9c34ece9dae8c841930d62e0b311b9130cb9439cd9cbeec950bca04fd7ee4e389b01b53e8f29dd646e453089ecaaadd4101622f580bad9493d84e5',
-        tx,
-      ],
-      [0, nonce],
-      0,
-      block,
-    );
-    console.log(res);
-    expect(res).to.be.null;
-  }).timeout(4000);
+  }).timeout(10000);
 });
