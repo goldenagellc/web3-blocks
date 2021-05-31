@@ -6,6 +6,7 @@ import ITx from './types/ITx';
 
 import BindableContract from './BindableContract';
 import Contract, { AsyncCaller as ContractCaller } from './Contract';
+import FlashbotsWallet from './FlashbotsWallet';
 import ProviderGroup from './ProviderGroup';
 import ProviderGroupEth from './ProviderGroupEth';
 import { providerFor, providersFor } from './Providers';
@@ -21,6 +22,7 @@ export {
   BindableContract,
   Contract,
   ContractCaller,
+  FlashbotsWallet,
   ProviderGroup,
   ProviderGroupEth,
   providerFor,
